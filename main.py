@@ -27,24 +27,28 @@ window = sg.Window('My To-Do App',
 
 while True:
     event, values = window.read(timeout=200)
+    print(event, values)
     window["clock"].update(value=time.strftime("%b %d, %Y %H:%M:%S"))
     match event:
         case "Add":
             todos = functions.get_todos()
             new_todo = values["todo"] + "\n"
-            todos.append(new_todo)
-            functions.write_todos(todos)
-            window["todos"].update(values=todos)
-            window["todo"].update(value='')
+            if not new_todo == "\n":
+                todos.append(new_todo)
+                functions.write_todos(todos)
+                window["todos"].update(values=todos)
+                window["todo"].update(value='')
         case "Edit":
             try:
                 todo_to_edit = values["todos"][0]
-                new_todo = values["todo"] + "\n"
+                new_todo = values["todo"]
+                print(new_todo)
                 todos = functions.get_todos()
                 index = todos.index(todo_to_edit)
-                todos[index] = new_todo
+                todos[index] = new_todo + "\n"
                 functions.write_todos(todos)
                 window["todos"].update(values=todos)
+                window["todo"].update(value='')
             except IndexError:
                 sg.popup("Please select item first.", font=("Helvetica", 11))
         case "Delete":
@@ -61,7 +65,7 @@ while True:
             break
         case "todos":
             try:
-                window["todo"].update(value=values["todos"][0])
+                window["todo"].update(value=values["todos"][0].strip("\n"))
             except IndexError:
                 sg.popup("No item in the list.")
         case sg.WIN_CLOSED:
